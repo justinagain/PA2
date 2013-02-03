@@ -8,6 +8,8 @@ import android.widget.TextView;
 
 public class GroupMessengerActivity extends Activity {
 
+	final static String INFO_TAG = "Project 1 Info: ";
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
