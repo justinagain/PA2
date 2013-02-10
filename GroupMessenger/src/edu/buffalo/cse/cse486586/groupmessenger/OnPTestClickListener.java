@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,6 +27,15 @@ public class OnPTestClickListener implements OnClickListener {
         mContentResolver = _cr;
         mUri = buildUri("content", "edu.buffalo.cse.cse486586.groupmessenger.provider");
         mContentValues = initTestValues();
+        for (int i = 0; i < mContentValues.length; i++) {
+            try {
+				Log.v(TAG, "About to insert to the content provider");
+				mContentResolver.acquireContentProviderClient("edu.buffalo.cse.cse486586.groupmessenger.provider").insert(mUri, mContentValues[i]);
+				Log.v(TAG, "Inserted to the content provider");
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}			
+		}
     }
 
     private Uri buildUri(String scheme, String authority) {
