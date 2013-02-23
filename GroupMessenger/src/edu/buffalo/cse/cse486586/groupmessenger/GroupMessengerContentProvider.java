@@ -1,10 +1,15 @@
 package edu.buffalo.cse.cse486586.groupmessenger;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,17 +18,13 @@ import android.util.Log;
 
 public class GroupMessengerContentProvider extends ContentProvider {
 
-	public final static String _ID = "_ID";
-	public final static String MESSAGE_COLUMN = "MESSAGE";
-	public final static String MESSAGES_TABLE = "MESSAGES";
+    private static final String TAG = OnPTestClickListener.class.getName();
 	
+	public final static String _ID = "_ID";	
 	public static Uri CONTENT_URI = Uri.parse("content://edu.buffalo.cse.cse486586.groupmessenger.provider");
+	private static int URI_ID = 0;
 
-	
-    GroupMessengerSQLiteOpenHelper groupMessengerSQLiteOpenHelper;
-    
 	public GroupMessengerContentProvider(){
-		//groupMessengerDatabase = SQLiteDatabase.openOrCreateDatabase(GROUP_MESSENGER_DATABASE_NAME, CursorFactory.this)
 	}
 	
 	@Override
@@ -35,23 +36,36 @@ public class GroupMessengerContentProvider extends ContentProvider {
 
 	@Override
 	public Uri insert(Uri groupMessengerUri, ContentValues contentValues) {
-		Log.v(GroupMessengerActivity.INFO_TAG, "MADE IT TO THE CONTENT PROVIDER!!!");
-		// Opens the database object in "write" mode.
-        SQLiteDatabase db = groupMessengerSQLiteOpenHelper.getWritableDatabase();
+		Log.v(GroupMessengerActivity.INFO_TAG, "About to insert into content provider with URI: " + groupMessengerUri.toString());
+        writeToInternalStorage(groupMessengerUri, contentValues);
+        getContext().getContentResolver().notifyChange(groupMessengerUri, null);
+		return groupMessengerUri;
+	}
+	
+	
+	private boolean writeToInternalStorage(Uri uri, ContentValues contentValues){
+		boolean success = false;
+		FileOutputStream fos;
+		try {
+			Log.v(GroupMessengerActivity.INFO_TAG, "About to insert into a speicific file");
+			String keyValue = contentValues.get(OnPTestClickListener.KEY_FIELD).toString();
+			String contentValue = contentValues.get(OnPTestClickListener.VALUE_FIELD).toString();
 
-        // Performs the insert and returns the ID of the new note.
-        long rowId = db.insert(
-            MESSAGES_TABLE, 
-            MESSAGE_COLUMN,  
-            contentValues
-        );
-
-        Uri newURI = null;
-        if (rowId > 0) {
-            newURI = ContentUris.withAppendedId(CONTENT_URI, rowId);
-            getContext().getContentResolver().notifyChange(newURI, null);
-        }		
-		return newURI;
+			String fileName = uri.toString().replace("content://", "");
+			fileName = fileName + "_" + keyValue;
+			fos = this.getContext().openFileOutput(fileName, Context.MODE_PRIVATE);
+			fos.write(contentValue.getBytes());				
+			fos.close();
+			success = true;
+			Log.v(TAG, "Wrote ContentValues successfully.");
+		} catch (FileNotFoundException e) {
+			Log.v(TAG, "File not found when writing ContentValues");
+			e.printStackTrace();
+		} catch (IOException e) {
+			Log.v(TAG, "Some IO Exception when writing ContentValues");
+			e.printStackTrace();
+		}
+		return success;
 	}
 	
 	/**
@@ -72,7 +86,6 @@ public class GroupMessengerContentProvider extends ContentProvider {
 
 	@Override
 	public boolean onCreate() {
-        groupMessengerSQLiteOpenHelper = new GroupMessengerSQLiteOpenHelper(getContext());
 		return false;
 	}
 

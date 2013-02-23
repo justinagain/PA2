@@ -14,8 +14,8 @@ public class OnPTestClickListener implements OnClickListener {
 
     private static final String TAG = OnPTestClickListener.class.getName();
     private static final int TEST_CNT = 50;
-    private static final String KEY_FIELD = "key";
-    private static final String VALUE_FIELD = "value";
+    public static final String KEY_FIELD = "key";
+    public static final String VALUE_FIELD = "value";
 
     private final TextView mTextView;
     private final ContentResolver mContentResolver;
@@ -26,10 +26,11 @@ public class OnPTestClickListener implements OnClickListener {
         mTextView = _tv;
         mContentResolver = _cr;
         mUri = buildUri("content", "edu.buffalo.cse.cse486586.groupmessenger.provider");
+        Log.v(TAG, "Build URI: " + mUri.toString());
         mContentValues = initTestValues();
         for (int i = 0; i < mContentValues.length; i++) {
             try {
-				Log.v(TAG, "About to insert to the content provider");
+				Log.v(TAG, "About to insert to the content provider: " + mContentValues[i]);
 				mContentResolver.acquireContentProviderClient("edu.buffalo.cse.cse486586.groupmessenger.provider").insert(mUri, mContentValues[i]);
 				Log.v(TAG, "Inserted to the content provider");
 			} catch (RemoteException e) {
