@@ -11,7 +11,19 @@ public class Util {
 
 	public static String getPortNumber(Activity activity){
 		TelephonyManager tel = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
-		return tel.getLine1Number().substring(tel.getLine1Number().length() - 4);		
+		String port = tel.getLine1Number().substring(tel.getLine1Number().length() - 4);
+		String avdIdentifier = "unspecified";
+		if(port.equals(Constants.AVD0_PORT)){
+			avdIdentifier = "avd0";
+		}
+		else if(port.equals(Constants.AVD1_PORT)){
+			avdIdentifier = "avd1";			
+		}
+		else if(port.equals(Constants.AVD2_PORT)){
+			avdIdentifier = "avd2";						
+		}
+		
+		return avdIdentifier;		
 	}
 	
 	public static String[] getRemoteClientPorts(String portString){

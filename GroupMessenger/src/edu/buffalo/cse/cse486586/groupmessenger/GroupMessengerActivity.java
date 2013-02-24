@@ -89,7 +89,8 @@ public class GroupMessengerActivity extends Activity {
 					msg = in.readLine();
 					ContentValues cv = createContentValues(msg);
 					try {
-						Log.v(INFO_TAG, "About to post to content resolver");
+						Log.v(INFO_TAG, "About to post to content resolver where: " + cv.get(OnPTestClickListener.KEY_FIELD) + ":" + 
+								cv.get(OnPTestClickListener.VALUE_FIELD));
 						mActivity.getContentResolver().acquireContentProviderClient("edu.buffalo.cse.cse486586.groupmessenger.provider").insert(mUri, cv);
 						Log.v(INFO_TAG, "Posted to content resolver");
 					} catch (RemoteException e) {

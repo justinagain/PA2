@@ -52,7 +52,7 @@ public class SendOnClickListener implements OnClickListener {
 		String messageText = mEditTextView.getText().toString();
 		Log.v(TAG, "Registered the 'send' click with text: " + messageText);
         ContentValues cv = new ContentValues();
-        cv.put(KEY_FIELD, "key" + GroupMessengerContentProvider.URI_ID);
+        cv.put(KEY_FIELD, GroupMessengerContentProvider.URI_ID + "");
         cv.put(VALUE_FIELD, messageText);
 		try {
 			Log.v(TAG, "About to add new ContentValue with: " + cv.get(KEY_FIELD) + " AND " + cv.get(VALUE_FIELD));
