@@ -27,7 +27,7 @@ public class GroupMessengerContentProvider extends ContentProvider {
 	
 	public final static String _ID = "_ID";	
 	public static Uri CONTENT_URI = Uri.parse("content://edu.buffalo.cse.cse486586.groupmessenger.provider");
-	private static int URI_ID = 0;
+	public static int URI_ID = 0;
 
 	public GroupMessengerContentProvider(){
 	}

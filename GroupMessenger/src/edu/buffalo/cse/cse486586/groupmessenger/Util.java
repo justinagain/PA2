@@ -14,7 +14,7 @@ public class Util {
 		return tel.getLine1Number().substring(tel.getLine1Number().length() - 4);		
 	}
 	
-	public String[] getRemoteClientPorts(String portString){
+	public static String[] getRemoteClientPorts(String portString){
 		String[] remoteClientPorts = null;
 		if(portString.equals(Constants.AVD0_PORT)){
 			remoteClientPorts = Constants.AVD0_REMOTE_CLIENTS;
