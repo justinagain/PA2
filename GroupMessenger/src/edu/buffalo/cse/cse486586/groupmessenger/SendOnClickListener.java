@@ -52,13 +52,13 @@ public class SendOnClickListener implements OnClickListener {
 		String messageText = mEditTextView.getText().toString();
 		Log.v(TAG, "Registered the 'send' click with text: " + messageText);
         ContentValues cv = new ContentValues();
+		GroupMessengerContentProvider.URI_ID++;
         cv.put(KEY_FIELD, GroupMessengerContentProvider.URI_ID + "");
         cv.put(VALUE_FIELD, messageText);
 		try {
 			Log.v(TAG, "About to add new ContentValue with: " + cv.get(KEY_FIELD) + " AND " + cv.get(VALUE_FIELD));
 			mContentResolver.acquireContentProviderClient("edu.buffalo.cse.cse486586.groupmessenger.provider").insert(mUri, cv);
 			sendToClients(mUri, cv);
-			GroupMessengerContentProvider.URI_ID++;
 		} catch (RemoteException e) {
 			Log.v(TAG, "Failed to add to ContentProvide: " + e.getMessage());
 			e.printStackTrace();

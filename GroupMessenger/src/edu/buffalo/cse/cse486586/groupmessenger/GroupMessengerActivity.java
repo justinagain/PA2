@@ -26,6 +26,8 @@ public class GroupMessengerActivity extends Activity {
 	// The tag info
 	final static String INFO_TAG = "Project 2 Info: ";
 	final static String TRY_CATCH_ERROR = "Try / Catch Error: ";
+	
+	static int[] received = new int[]{0,0,0};
 
 
 	@Override
@@ -88,6 +90,7 @@ public class GroupMessengerActivity extends Activity {
 					BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					msg = in.readLine();
 					ContentValues cv = createContentValues(msg);
+					Log.v(INFO_TAG, "My values are: " + received[0] + " " + received[1] + " " + received[2]);
 					try {
 						Log.v(INFO_TAG, "About to post to content resolver where: " + cv.get(OnPTestClickListener.KEY_FIELD) + ":" + 
 								cv.get(OnPTestClickListener.VALUE_FIELD));
@@ -111,7 +114,18 @@ public class GroupMessengerActivity extends Activity {
 		private ContentValues createContentValues(String msg) {
 			ContentValues contentValues = new ContentValues();
 			String[] possibleKeys = msg.split(":");
-			contentValues.put(OnPTestClickListener.KEY_FIELD, possibleKeys[1]);
+			String avd = possibleKeys[0];
+			String key = possibleKeys[1];
+			if(avd.equals("avd0")){
+				received[0] = Integer.parseInt(key);
+			}
+			else if(avd.equals("avd1")){
+				received[1] = Integer.parseInt(key);				
+			}
+			else if(avd.equals("avd2")){
+				received[2] = Integer.parseInt(key);				
+			}
+			contentValues.put(OnPTestClickListener.KEY_FIELD, key);
 			String message = "";
 			for(int i = 2; i < possibleKeys.length; i++){
 				message = message + possibleKeys[i];
