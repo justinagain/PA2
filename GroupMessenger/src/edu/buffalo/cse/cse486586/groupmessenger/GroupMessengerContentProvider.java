@@ -15,9 +15,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
+import android.view.ViewGroup.MarginLayoutParams;
 
 public class GroupMessengerContentProvider extends ContentProvider {
 
@@ -42,25 +44,29 @@ public class GroupMessengerContentProvider extends ContentProvider {
 	@Override
 	public Cursor query(Uri providedUri, String[] arg1, String keyValue, String[] arg3,
 			String arg4) {
+		MatrixCursor matrixCursor = new MatrixCursor(new String[]{"key", "value"});
 		try {
 			String fileName = providedUri.toString();
 			fileName = fileName + "_" + keyValue;
 			fileName = fileName.replace("content://", "");
 			FileInputStream fis = this.getContext().openFileInput(fileName);
 			Log.v(GroupMessengerActivity.INFO_TAG, "About to read from a speicific file: " + fileName);
-			int character;
-			while ((character= fis.read()) != -1) {
-				// convert to char and display it
-				Log.v(TAG, (char) character + "");
+			int characterIntValue;
+			String value = "";
+			while ((characterIntValue= fis.read()) != -1) {
+				value = value + (char)characterIntValue;
 			}		
-			} catch (FileNotFoundException e) {
+			String[] cursorRow = new String[]{keyValue, value};
+			matrixCursor.addRow(cursorRow);
+			Log.v(TAG, "Value read from file is: " + value);
+		} catch (FileNotFoundException e) {
 			Log.v(TAG, "File not found when reading ContentValues");
 			e.printStackTrace();
 		} catch (IOException e) {
 			Log.v(TAG, "Some IO Exception when reading ContentValues");
 			e.printStackTrace();
 		}
-		return null;
+		return matrixCursor;
 	}
 	
 	
