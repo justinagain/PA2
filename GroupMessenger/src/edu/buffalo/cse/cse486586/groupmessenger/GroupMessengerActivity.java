@@ -30,21 +30,14 @@ public class GroupMessengerActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_messenger);
 
-        TextView tv = (TextView) findViewById(R.id.textView1);
-        tv.setMovementMethod(new ScrollingMovementMethod());
+        TextView textView = (TextView) findViewById(R.id.textView1);
+        textView.setMovementMethod(new ScrollingMovementMethod());
         findViewById(R.id.button1).setOnClickListener(
-                new OnPTestClickListener(tv, getContentResolver()));
+                new OnPTestClickListener(textView, getContentResolver()));
         createServerSocket();
-		final Button sendButton = (Button) findViewById(R.id.button4);
-		sendButton.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-		})
-
+		Button sendButton = (Button) findViewById(R.id.button4);
+		TextView editTextView = (TextView)findViewById(R.id.editText1);
+		sendButton.setOnClickListener(new SendOnClickListener(textView, editTextView, getContentResolver()));
 	}
 
 	private void createServerSocket() {
