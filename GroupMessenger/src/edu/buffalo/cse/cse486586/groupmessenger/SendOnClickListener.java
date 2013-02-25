@@ -53,9 +53,19 @@ public class SendOnClickListener implements OnClickListener {
 		Log.v(TAG, "Registered the 'send' click with text: " + messageText);
         ContentValues cv = new ContentValues();
 		GroupMessengerContentProvider.URI_ID++;
+		if(Util.getPortNumber(mActivity).equals("avd0")){
+			GroupMessengerActivity.CURRENT_STATE[0] = GroupMessengerContentProvider.URI_ID;
+		}
+		else if(Util.getPortNumber(mActivity).equals("avd1")){
+			GroupMessengerActivity.CURRENT_STATE[1] = GroupMessengerContentProvider.URI_ID;
+		}
+		else if(Util.getPortNumber(mActivity).equals("avd2")){
+			GroupMessengerActivity.CURRENT_STATE[2] = GroupMessengerContentProvider.URI_ID;
+		}
+
         cv.put(KEY_FIELD, GroupMessengerContentProvider.URI_ID + "");
         cv.put(VALUE_FIELD, messageText);
-		try {
+        try {
 			Log.v(TAG, "About to add new ContentValue with: " + cv.get(KEY_FIELD) + " AND " + cv.get(VALUE_FIELD));
 			mContentResolver.acquireContentProviderClient("edu.buffalo.cse.cse486586.groupmessenger.provider").insert(mUri, cv);
 			sendToClients(mUri, cv);
@@ -72,7 +82,11 @@ public class SendOnClickListener implements OnClickListener {
 			Log.v(TAG, "ContentValues string is (lets hope it is parsable): " + cv.toString());
 			String key = (String)cv.get(KEY_FIELD);
 			String value = (String)cv.get(VALUE_FIELD);
-			String message =  Util.getPortNumber(mActivity) + ":" + key + ":" + value; 
+			String message =  Util.getPortNumber(mActivity) + ":" + 
+					GroupMessengerActivity.CURRENT_STATE[0] + ":" + 
+					GroupMessengerActivity.CURRENT_STATE[1] + ":" +
+					GroupMessengerActivity.CURRENT_STATE[2] + ":" +
+					value; 
 			new ClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, pushPorts[i], message);
 		}
 	}

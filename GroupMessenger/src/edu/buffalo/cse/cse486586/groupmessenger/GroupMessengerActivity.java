@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import edu.buffalo.cse.cse486586.groupmessenger.R;
 import android.net.Uri;
@@ -27,8 +28,8 @@ public class GroupMessengerActivity extends Activity {
 	final static String INFO_TAG = "Project 2 Info: ";
 	final static String TRY_CATCH_ERROR = "Try / Catch Error: ";
 	
-	static int[] received = new int[]{0,0,0};
-
+	public static int[] CURRENT_STATE = new int[]{0,0,0};
+	private ArrayList<BufferedMessage> bufferedMessages = new ArrayList<BufferedMessage>();
 
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +91,7 @@ public class GroupMessengerActivity extends Activity {
 					BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					msg = in.readLine();
 					ContentValues cv = createContentValues(msg);
-					Log.v(INFO_TAG, "My values are: " + received[0] + " " + received[1] + " " + received[2]);
+					Log.v(INFO_TAG, "My values are: " + CURRENT_STATE[0] + " " + CURRENT_STATE[1] + " " + CURRENT_STATE[2]);
 					try {
 						Log.v(INFO_TAG, "About to post to content resolver where: " + cv.get(OnPTestClickListener.KEY_FIELD) + ":" + 
 								cv.get(OnPTestClickListener.VALUE_FIELD));
@@ -115,22 +116,21 @@ public class GroupMessengerActivity extends Activity {
 			ContentValues contentValues = new ContentValues();
 			String[] possibleKeys = msg.split(":");
 			String avd = possibleKeys[0];
-			String key = possibleKeys[1];
-			if(avd.equals("avd0")){
-				received[0] = Integer.parseInt(key);
-			}
-			else if(avd.equals("avd1")){
-				received[1] = Integer.parseInt(key);				
-			}
-			else if(avd.equals("avd2")){
-				received[2] = Integer.parseInt(key);				
-			}
-			contentValues.put(OnPTestClickListener.KEY_FIELD, key);
+			String key1 = possibleKeys[1];
+			String key2 = possibleKeys[2];
+			String key3 = possibleKeys[3];
+			contentValues.put(OnPTestClickListener.KEY_FIELD, key1);
 			String message = "";
-			for(int i = 2; i < possibleKeys.length; i++){
+			for(int i = 4; i < possibleKeys.length; i++){
 				message = message + possibleKeys[i];
 			}
 			contentValues.put(OnPTestClickListener.VALUE_FIELD, message);
+			bufferedMessages.add(new BufferedMessage(Integer.parseInt(key1), contentValues));
+			CURRENT_STATE[0] = Integer.parseInt(key1);
+			CURRENT_STATE[1] = Integer.parseInt(key2);
+			CURRENT_STATE[2] = Integer.parseInt(key3);			
+			Log.v(INFO_TAG, "Received values are: " + avd + " " + key1 + " " + key2 + " " + key3 + " " + message);
+			Log.v(INFO_TAG, "Updated CURRENT_STATE to: " + CURRENT_STATE[0] + " " + CURRENT_STATE[1] + " " + CURRENT_STATE[2]);
 			return contentValues;
 		}
 
