@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 
 import android.app.Activity;
@@ -26,16 +27,14 @@ public class SendOnClickListener implements OnClickListener {
 
     private final TextView mTextView;
     private final TextView mEditTextView;
-    private final ContentResolver mContentResolver;
     private final Uri mUri;
     private final Activity mActivity;
 //    private final ContentValues[] mContentValues;
 
-    public SendOnClickListener(Activity _a, TextView _tv, TextView _metv, ContentResolver _cr){
+    public SendOnClickListener(Activity _a, TextView _tv, TextView _metv){
         mEditTextView = _metv;
     	mTextView = _tv;
-        mContentResolver = _cr;
-        mActivity = _a;
+    	mActivity = _a;
         mUri = buildUri("content", "edu.buffalo.cse.cse486586.groupmessenger.provider");
         Log.v(TAG, "Build URI: " + mUri.toString());
     }
@@ -51,42 +50,16 @@ public class SendOnClickListener implements OnClickListener {
 	public void onClick(View arg0) {
 		String messageText = mEditTextView.getText().toString();
 		Log.v(TAG, "Registered the 'send' click with text: " + messageText);
-        ContentValues cv = new ContentValues();
-		GroupMessengerContentProvider.URI_ID++;
-		if(Util.getPortNumber(mActivity).equals("avd0")){
-			GroupMessengerActivity.CURRENT_STATE[0] = GroupMessengerContentProvider.URI_ID;
-		}
-		else if(Util.getPortNumber(mActivity).equals("avd1")){
-			GroupMessengerActivity.CURRENT_STATE[1] = GroupMessengerContentProvider.URI_ID;
-		}
-		else if(Util.getPortNumber(mActivity).equals("avd2")){
-			GroupMessengerActivity.CURRENT_STATE[2] = GroupMessengerContentProvider.URI_ID;
-		}
-
-        cv.put(KEY_FIELD, GroupMessengerContentProvider.URI_ID + "");
-        cv.put(VALUE_FIELD, messageText);
-        try {
-			Log.v(TAG, "About to add new ContentValue with: " + cv.get(KEY_FIELD) + " AND " + cv.get(VALUE_FIELD));
-			mContentResolver.acquireContentProviderClient("edu.buffalo.cse.cse486586.groupmessenger.provider").insert(mUri, cv);
-			sendToClients(mUri, cv);
-		} catch (RemoteException e) {
-			Log.v(TAG, "Failed to add to ContentProvide: " + e.getMessage());
-			e.printStackTrace();
-		}
-
+        sendToClients(messageText);
 	}
 
-	private void sendToClients(Uri mUri2, ContentValues cv) {
+	private void sendToClients(String messageText) {
 		String[] pushPorts = Constants.AVD_REMOTE_CLIENTS;
+		GroupMessengerContentProvider.URI_ID++;
 		for(int i = 0; i < pushPorts.length; i++){
-			Log.v(TAG, "ContentValues string is (lets hope it is parsable): " + cv.toString());
-			String key = (String)cv.get(KEY_FIELD);
-			String value = (String)cv.get(VALUE_FIELD);
-			String message =  Util.getPortNumber(mActivity) + ":" + 
-					GroupMessengerActivity.CURRENT_STATE[0] + ":" + 
-					GroupMessengerActivity.CURRENT_STATE[1] + ":" +
-					GroupMessengerActivity.CURRENT_STATE[2] + ":" +
-					value; 
+			String message =  Util.getPortNumber(mActivity) + ":" + GroupMessengerContentProvider.URI_ID + ":" + messageText; 
+			GroupMessengerActivity.RECEVIED_COUNTER++;
+			Log.v(TAG, "Held back a message");
 			new ClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, pushPorts[i], message);
 		}
 	}

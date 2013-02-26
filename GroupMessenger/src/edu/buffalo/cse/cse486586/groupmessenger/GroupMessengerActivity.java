@@ -27,10 +27,10 @@ public class GroupMessengerActivity extends Activity {
 	// The tag info
 	final static String INFO_TAG = "Project 2 Info: ";
 	final static String TRY_CATCH_ERROR = "Try / Catch Error: ";
+	public static int RECEVIED_COUNTER = 0;
+	private ArrayList<HoldBackMessage> holdBackMessages = new ArrayList<HoldBackMessage>();
 	
-	public static int[] CURRENT_STATE = new int[]{0,0,0};
-	private ArrayList<BufferedMessage> bufferedMessages = new ArrayList<BufferedMessage>();
-
+	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +43,7 @@ public class GroupMessengerActivity extends Activity {
         createServerSocket();
 		Button sendButton = (Button) findViewById(R.id.button4);
 		TextView editTextView = (TextView)findViewById(R.id.editText1);
-		sendButton.setOnClickListener(new SendOnClickListener(this, textView, editTextView, getContentResolver()));
+		sendButton.setOnClickListener(new SendOnClickListener(this, textView, editTextView));
 	}
 
 	private void createServerSocket() {
@@ -90,18 +90,22 @@ public class GroupMessengerActivity extends Activity {
 					Log.v(INFO_TAG, "A message is coming in ... ");
 					BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					msg = in.readLine();
-					ContentValues cv = createContentValues(msg);
-					Log.v(INFO_TAG, "My values are: " + CURRENT_STATE[0] + " " + CURRENT_STATE[1] + " " + CURRENT_STATE[2]);
-					try {
-						Log.v(INFO_TAG, "About to post to content resolver where: " + cv.get(OnPTestClickListener.KEY_FIELD) + ":" + 
-								cv.get(OnPTestClickListener.VALUE_FIELD));
-						mActivity.getContentResolver().acquireContentProviderClient("edu.buffalo.cse.cse486586.groupmessenger.provider").insert(mUri, cv);
-						Log.v(INFO_TAG, "Posted to content resolver");
-					} catch (RemoteException e) {
-						Log.v(INFO_TAG, "Error posting to content resolver");
-						e.printStackTrace();
+					String[] possibleKeys = msg.split(":");
+					String avd = possibleKeys[0];
+					String messageId = possibleKeys[1];
+					String message = "";
+					for(int i = 2; i < possibleKeys.length; i++){
+						message = message + possibleKeys[i];
 					}
-					Log.v(INFO_TAG, "The message is: " + msg);
+					Log.v(INFO_TAG, "Stash a message - hold it back!");
+					GroupMessengerActivity.RECEVIED_COUNTER++;
+					HoldBackMessage holdBackMessage = new HoldBackMessage(
+							message, 
+							Integer.parseInt(messageId), 
+							avd, 
+							GroupMessengerActivity.RECEVIED_COUNTER, 
+							true);
+					holdBackMessages.add(holdBackMessage);
 					publishProgress(msg);
 					socket.close();
 				}
@@ -117,20 +121,13 @@ public class GroupMessengerActivity extends Activity {
 			String[] possibleKeys = msg.split(":");
 			String avd = possibleKeys[0];
 			String key1 = possibleKeys[1];
-			String key2 = possibleKeys[2];
-			String key3 = possibleKeys[3];
 			contentValues.put(OnPTestClickListener.KEY_FIELD, key1);
 			String message = "";
-			for(int i = 4; i < possibleKeys.length; i++){
+			for(int i = 2; i < possibleKeys.length; i++){
 				message = message + possibleKeys[i];
 			}
 			contentValues.put(OnPTestClickListener.VALUE_FIELD, message);
-			bufferedMessages.add(new BufferedMessage(Integer.parseInt(key1), contentValues));
-			CURRENT_STATE[0] = Integer.parseInt(key1);
-			CURRENT_STATE[1] = Integer.parseInt(key2);
-			CURRENT_STATE[2] = Integer.parseInt(key3);			
-			Log.v(INFO_TAG, "Received values are: " + avd + " " + key1 + " " + key2 + " " + key3 + " " + message);
-			Log.v(INFO_TAG, "Updated CURRENT_STATE to: " + CURRENT_STATE[0] + " " + CURRENT_STATE[1] + " " + CURRENT_STATE[2]);
+			Log.v(INFO_TAG, "Received values are: " + avd + " " + key1 + " " + message);
 			return contentValues;
 		}
 
