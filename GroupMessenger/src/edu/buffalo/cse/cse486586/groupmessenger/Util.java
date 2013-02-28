@@ -45,5 +45,19 @@ public class Util {
 		}
 		return remoteClientPorts;
 	}
+
+	public static int getPortNumber(String avd) {
+		int port = 0;
+		if(avd.equals("avd0")){
+			port = Integer.parseInt(Constants.AVD0_REDIRECT_PORT);
+		}
+		else if(avd.equals("avd1")){
+			port = Integer.parseInt(Constants.AVD1_REDIRECT_PORT);			
+		}
+		else if(avd.equals("avd2")){
+			port = Integer.parseInt(Constants.AVD1_REDIRECT_PORT);						
+		}
+		return port;
+	}
 	
 }
