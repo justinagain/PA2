@@ -1,5 +1,7 @@
 package edu.buffalo.cse.cse486586.groupmessenger;
 
+import android.content.ContentValues;
+
 public class BroadcastMessage {
 	
 	private static final String REQUEST_BROADCAST = "r";
@@ -16,6 +18,14 @@ public class BroadcastMessage {
 		payload = new byte[142];
 		initializeArray();
 		payload[0] = type.getBytes()[0];
+	}
+
+	public static BroadcastMessage createMessageFromByteArray(byte[] data) {
+		return new BroadcastMessage(data);
+	}
+
+	private BroadcastMessage(byte[] newPayload) {
+		payload = newPayload;
 	}
 
 	private void initializeArray() {
@@ -46,6 +56,14 @@ public class BroadcastMessage {
 	public int getMessageSize(){ return Integer.parseInt(getPayloadAsInt(3, MSG_SIZE_INSERT_PT));}
 	public void setMessage(String message){ insertTextPayloadContent(message, MSG_INSERT_PT); }
 	public String getMessage(){ return new String(getPayloadAsString(getMessageSize(), MSG_INSERT_PT)); }
+	public byte[] getPayload(){ return payload;}
+		
+	public ContentValues getAsContentValue(){
+		ContentValues contentValues = new ContentValues();
+		contentValues.put(OnPTestClickListener.KEY_FIELD, getAvdSequenceNumber());
+		contentValues.put(OnPTestClickListener.VALUE_FIELD, getMessage());
+		return contentValues;
+	}	
 	
 	/** byte[] manipulation methods */
 	private String getPayloadAsInt(int size, int startPoint) {
@@ -65,9 +83,9 @@ public class BroadcastMessage {
 
 	private void insertTextPayloadContent(String value, int insertPoint) {
 		byte[] stringBytes = value.getBytes();
-		for (int i = 0; i <= MSG_SIZE; i++) {
-			insertPoint = insertPoint + i;
+		for (int i = 0; i < value.length(); i++) {
 			payload[insertPoint] = stringBytes[i];
+			insertPoint = insertPoint + 1;
 		}
 	}
 	

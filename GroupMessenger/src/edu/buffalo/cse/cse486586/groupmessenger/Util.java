@@ -30,18 +30,18 @@ public class Util {
 		String[] remoteClientPorts = null;
 		if(portString.equals(Constants.AVD0_PORT)){
 			remoteClientPorts = Constants.AVD0_REMOTE_CLIENTS;
-			Log.v(GroupMessengerActivity.INFO_TAG, "Found port to push to avd1 avd2");
+			Log.v(GroupMessengerActivity.TAG, "Found port to push to avd1 avd2");
 		}
 		else if(portString.equals(Constants.AVD1_PORT)){
 			remoteClientPorts = Constants.AVD1_REMOTE_CLIENTS;
-			Log.v(GroupMessengerActivity.INFO_TAG, "Found port to push to avd0 avd2");
+			Log.v(GroupMessengerActivity.TAG, "Found port to push to avd0 avd2");
 		}
 		else if(portString.equals(Constants.AVD2_PORT)){
 			remoteClientPorts = Constants.AVD2_REMOTE_CLIENTS;
-			Log.v(GroupMessengerActivity.INFO_TAG, "Found port to push to avd0 avd1");
+			Log.v(GroupMessengerActivity.TAG, "Found port to push to avd0 avd1");
 		}
 		else{
-			Log.v(GroupMessengerActivity.INFO_TAG, "Did not find a push port!");
+			Log.v(GroupMessengerActivity.TAG, "Did not find a push port!");
 		}
 		return remoteClientPorts;
 	}

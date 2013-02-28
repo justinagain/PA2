@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -19,6 +20,7 @@ public class ServerTask extends AsyncTask<ServerSocket, String, Void>{
 	final static String INFO_TAG = "Project 2 Info: ";
 	private Activity mActivity;
 	private Uri mUri;
+	private ArrayList<BroadcastMessage> bmList = new ArrayList<BroadcastMessage>();
 	
 	ServerTask(Activity activity, Uri uri){
 		mActivity = activity;
@@ -33,28 +35,23 @@ public class ServerTask extends AsyncTask<ServerSocket, String, Void>{
 		Socket socket;
 		try{
 			while(true){					
-				Log.v(INFO_TAG, "About to have socket accept");
+				Log.v(INFO_TAG, "Socket awaits accept ... ");
 				socket = serverSocket.accept();
 				Log.v(INFO_TAG, "A message is coming in ... ");
 				InputStream stream = socket.getInputStream();
 				byte[] data = new byte[BroadcastMessage.MSG_SIZE];
 				int count = stream.read(data);				
 				Log.v(INFO_TAG, "Message recieved with bytes: " + count);
-				
-//				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//				msg = in.readLine();
-//				Log.v(INFO_TAG, "The message is " + msg);
-//				String[] possibleKeys = msg.split(":");
-//				String avd = possibleKeys[0];
-//				String messageId = possibleKeys[1];
-//				String message = "";
-//				for(int i = 2; i < possibleKeys.length; i++){
-//					message = message + possibleKeys[i];
-//				}
-//				Log.v(INFO_TAG, "Stash a message - hold it back!");
-				GroupMessengerActivity.RECEVIED_COUNTER++;
-				publishProgress("Received");
+				//GroupMessengerActivity.RECEVIED_COUNTER++;
+				BroadcastMessage bm = BroadcastMessage.createMessageFromByteArray(data);
+				if(bm.isRequestBroadcast()){
+					Log.v(INFO_TAG, "A broadcast request has been received.");
+				}
+				else{
+					Log.v(INFO_TAG, "A broadcast has been received.");					
+				}
 				socket.close();
+				publishProgress(bm.getAvd()+":"+bm.getAvdSequenceNumber()+":"+bm.getMessage());
 			}
 		}
 		catch (IOException e){
@@ -63,21 +60,6 @@ public class ServerTask extends AsyncTask<ServerSocket, String, Void>{
 		return null;
 	}
 	
-	private ContentValues createContentValues(String msg) {
-		ContentValues contentValues = new ContentValues();
-		String[] possibleKeys = msg.split(":");
-		String avd = possibleKeys[0];
-		String key1 = possibleKeys[1];
-		contentValues.put(OnPTestClickListener.KEY_FIELD, key1);
-		String message = "";
-		for(int i = 2; i < possibleKeys.length; i++){
-			message = message + possibleKeys[i];
-		}
-		contentValues.put(OnPTestClickListener.VALUE_FIELD, message);
-		Log.v(INFO_TAG, "Received values are: " + avd + " " + key1 + " " + message);
-		return contentValues;
-	}
-
 	protected void onProgressUpdate(String... strings){
 		TextView textView = (TextView)mActivity.findViewById(R.id.textView1);
 		textView.append(strings[0] + "\n");

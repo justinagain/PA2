@@ -26,7 +26,7 @@ import android.widget.TextView;
 public class GroupMessengerActivity extends Activity {
 
 	// The tag info
-	final static String INFO_TAG = "Project 2 Info: ";
+	final static String TAG = "Project 2 Info: ";
 	public static int RECEVIED_COUNTER = 0;
 	
 	
@@ -49,12 +49,10 @@ public class GroupMessengerActivity extends Activity {
 		try{
 			ServerSocket serverSocket = new ServerSocket(10000);
 	        Uri uri = buildUri("content", "edu.buffalo.cse.cse486586.groupmessenger.provider");
-			new ServerTask(this, uri).executeOnExecutor(
-					AsyncTask.THREAD_POOL_EXECUTOR, 
-					serverSocket);
+			new ServerTask(this, uri).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, serverSocket);
 		}
 		catch(IOException e){
-			Log.v(INFO_TAG, "Exception creating ServerSocket");
+			Log.v(TAG, "Exception creating ServerSocket");
 		}
 	}
 	
@@ -67,7 +65,6 @@ public class GroupMessengerActivity extends Activity {
 
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.activity_group_messenger, menu);
         return true;
     }

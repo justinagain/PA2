@@ -50,7 +50,7 @@ public class GroupMessengerContentProvider extends ContentProvider {
 			fileName = fileName + "_" + keyValue;
 			fileName = fileName.replace("content://", "");
 			FileInputStream fis = this.getContext().openFileInput(fileName);
-			Log.v(GroupMessengerActivity.INFO_TAG, "About to read from a speicific file: " + fileName);
+			Log.v(GroupMessengerActivity.TAG, "About to read from a speicific file: " + fileName);
 			int characterIntValue;
 			String value = "";
 			while ((characterIntValue= fis.read()) != -1) {
@@ -72,7 +72,7 @@ public class GroupMessengerContentProvider extends ContentProvider {
 	
 	@Override
 	public Uri insert(Uri groupMessengerUri, ContentValues contentValues) {
-		Log.v(GroupMessengerActivity.INFO_TAG, "About to insert into content provider with URI: " + groupMessengerUri.toString());
+		Log.v(GroupMessengerActivity.TAG, "About to insert into content provider with URI: " + groupMessengerUri.toString());
         writeToInternalStorage(groupMessengerUri, contentValues);
         getContext().getContentResolver().notifyChange(groupMessengerUri, null);
 		return groupMessengerUri;
@@ -83,13 +83,13 @@ public class GroupMessengerContentProvider extends ContentProvider {
 		boolean success = false;
 		FileOutputStream fos;
 		try {
-			Log.v(GroupMessengerActivity.INFO_TAG, "About to insert into a speicific file");
+			Log.v(GroupMessengerActivity.TAG, "About to insert into a speicific file");
 			String keyValue = contentValues.get(OnPTestClickListener.KEY_FIELD).toString();
 			String contentValue = contentValues.get(OnPTestClickListener.VALUE_FIELD).toString();
 
 			String fileName = uri.toString().replace("content://", "");
 			fileName = fileName + "_" + keyValue;
-			Log.v(GroupMessengerActivity.INFO_TAG, "filename is: " + fileName);
+			Log.v(GroupMessengerActivity.TAG, "filename is: " + fileName);
 			fos = this.getContext().openFileOutput(fileName, Context.MODE_PRIVATE);
 			fos.write(contentValue.getBytes());				
 			fos.close();

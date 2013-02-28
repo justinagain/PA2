@@ -29,7 +29,6 @@ public class SendOnClickListener implements OnClickListener {
     private final TextView mEditTextView;
     private final Uri mUri;
     private final Activity mActivity;
-//    private final ContentValues[] mContentValues;
 
     public SendOnClickListener(Activity _a, TextView _tv, TextView _metv){
         mEditTextView = _metv;
@@ -54,22 +53,23 @@ public class SendOnClickListener implements OnClickListener {
 	}
 
 	private void sendToClients(String messageText) {
-		String[] pushPorts = Constants.AVD_REMOTE_CLIENTS;
 		GroupMessengerContentProvider.URI_ID++;
-		for(int i = 0; i < pushPorts.length; i++){
-			String message =  Util.getPortNumber(mActivity) + ":" + GroupMessengerContentProvider.URI_ID + ":" + messageText; 
-			GroupMessengerActivity.RECEVIED_COUNTER++;
-			Log.v(TAG, "Held back a message");
-			new ClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, pushPorts[i], message);
-		}
+		Log.v(TAG, "Creating BroadcastMessage and setting values");
+		BroadcastMessage bm = BroadcastMessage.getRequestBroadcaseMessage();
+		bm.setAvd(Util.getPortNumber(mActivity));
+		bm.setAvdSequenceNumber(GroupMessengerContentProvider.URI_ID + "");
+		bm.setMessageSize(messageText.length() + "");
+		bm.setMessage(messageText);
+		Log.v(TAG, "BroadcastMessage created");
+		new ClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, bm);
 	}
 
-	private class ClientTask extends AsyncTask<String, Void, Void>{
-		protected Void doInBackground(String... msgs){
+	private class ClientTask extends AsyncTask<BroadcastMessage, Void, Void>{
+		protected Void doInBackground(BroadcastMessage... msgs){
 			try {
-				Log.v(TAG, "About to push to socket: " + msgs[0]);
-				Socket writeSocket = new Socket(Constants.IP_ADDRESS, Integer.parseInt(msgs[0]));
-				writeSocket.getOutputStream().write(msgs[1].getBytes());
+				Log.v(TAG, "About to push to socket: " + Constants.SEQUENCER);
+				Socket writeSocket = new Socket(Constants.IP_ADDRESS, Constants.SEQUENCER);
+				writeSocket.getOutputStream().write(msgs[0].getPayload());
 				writeSocket.getOutputStream().flush();
 				writeSocket.close();
 				Log.v(TAG, "Pushed!");
