@@ -14,13 +14,13 @@ public class Util {
 		String port = tel.getLine1Number().substring(tel.getLine1Number().length() - 4);
 		String avdIdentifier = "unspecified";
 		if(port.equals(Constants.AVD0_PORT)){
-			avdIdentifier = "avd0";
+			avdIdentifier = Constants.AVD0;
 		}
 		else if(port.equals(Constants.AVD1_PORT)){
-			avdIdentifier = "avd1";			
+			avdIdentifier = Constants.AVD1;			
 		}
 		else if(port.equals(Constants.AVD2_PORT)){
-			avdIdentifier = "avd2";						
+			avdIdentifier = Constants.AVD2;						
 		}
 		
 		return avdIdentifier;		
@@ -48,13 +48,13 @@ public class Util {
 
 	public static int getPortNumber(String avd) {
 		int port = 0;
-		if(avd.equals("avd0")){
+		if(avd.equals(Constants.AVD0)){
 			port = Integer.parseInt(Constants.AVD0_REDIRECT_PORT);
 		}
-		else if(avd.equals("avd1")){
+		else if(avd.equals(Constants.AVD1)){
 			port = Integer.parseInt(Constants.AVD1_REDIRECT_PORT);			
 		}
-		else if(avd.equals("avd2")){
+		else if(avd.equals(Constants.AVD2)){
 			port = Integer.parseInt(Constants.AVD1_REDIRECT_PORT);						
 		}
 		return port;

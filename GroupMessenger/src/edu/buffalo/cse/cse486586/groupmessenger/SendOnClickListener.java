@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 import android.app.Activity;
@@ -29,6 +30,8 @@ public class SendOnClickListener implements OnClickListener {
     private final TextView mEditTextView;
     private final Uri mUri;
     private final Activity mActivity;
+    
+    private AtomicInteger avdAwareSequenceId = new AtomicInteger(0);
 
     public SendOnClickListener(Activity _a, TextView _tv, TextView _metv){
         mEditTextView = _metv;
@@ -53,14 +56,15 @@ public class SendOnClickListener implements OnClickListener {
 	}
 
 	private void sendToClients(String messageText) {
-		GroupMessengerContentProvider.URI_ID++;
 		Log.v(TAG, "Creating BroadcastMessage and setting values");
 		BroadcastMessage bm = BroadcastMessage.getRequestBroadcaseMessage();
 		bm.setAvd(Util.getPortNumber(mActivity));
-		bm.setAvdSequenceNumber(GroupMessengerContentProvider.URI_ID + "");
+		bm.setAvdSequenceNumber(avdAwareSequenceId.intValue() + "");
+		avdAwareSequenceId.incrementAndGet();
 		bm.setMessageSize(messageText.length() + "");
 		bm.setMessage(messageText);
-		Log.v(TAG, "BroadcastMessage created");
+		Log.v(TAG, "BroadcastMessage created for " + Util.getPortNumber(mActivity));
+		Log.v(TAG, "avdAwareSequenceNumber is: " + avdAwareSequenceId.intValue());
 		new ClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, bm);
 	}
 

@@ -5,6 +5,11 @@ import java.net.URISyntaxException;
 
 public class Constants {
 	final public static String IP_ADDRESS = "10.0.2.2";
+
+	final public static String AVD0 = "avd0";
+	final public static String AVD1 = "avd1";
+	final public static String AVD2 = "avd2";
+
 	final public static String AVD0_PORT = "5554";
 	final public static String AVD1_PORT = "5556";
 	final public static String AVD2_PORT = "5558";
