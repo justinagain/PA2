@@ -2,7 +2,7 @@ package edu.buffalo.cse.cse486586.groupmessenger;
 
 import android.content.ContentValues;
 
-public class BroadcastMessage {
+public class BroadcastMessage implements Comparable<BroadcastMessage>{
 	
 	private static final String REQUEST_BROADCAST = "r";
 	private static final String BROADCAST = "b";
@@ -96,6 +96,11 @@ public class BroadcastMessage {
 			isRequestBroadcast = true;
 		}
 		return isRequestBroadcast;
+	}
+
+	@Override
+	public int compareTo(BroadcastMessage comparedToBroadcastMessage) {
+		return getAvdSequenceNumber() - comparedToBroadcastMessage.getAvdSequenceNumber();	
 	}
 	
 }
