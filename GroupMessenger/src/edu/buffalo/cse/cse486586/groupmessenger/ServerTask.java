@@ -17,6 +17,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.RemoteException;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -28,6 +29,8 @@ public class ServerTask extends AsyncTask<ServerSocket, String, Void>{
 	private AtomicInteger sequencerNumber = new AtomicInteger(0);
 	HashMap<String, ArrayList<BroadcastMessage>> bufferedSequencerMessages = new HashMap<String, ArrayList<BroadcastMessage>>();
 	HashMap<String, AtomicInteger> globalSequencerNumbers = new HashMap<String, AtomicInteger>();
+	AtomicInteger broadcastRecieptNumbers = new AtomicInteger(1);
+	ArrayList<BroadcastMessage> broadcastRecieptBuffer = new ArrayList<BroadcastMessage>();
 	
 	ServerTask(Activity activity, Uri uri){
 		mActivity = activity;
@@ -130,7 +133,54 @@ public class ServerTask extends AsyncTask<ServerSocket, String, Void>{
 
 	private void processBroadcastReceipt(BroadcastMessage bm) {
 		Log.v(INFO_TAG, "Processing a BroadcastReceipt");
-		publishProgress(bm.getAvd() + ":" + bm.getAvdSequenceNumber() + ":" + bm.getMessage());
+		//publishProgress(bm.getAvd() + ":" + bm.getAvdSequenceNumber() + ":" + bm.getMessage());
+		// If the received number is equal to the expect, then
+		if(bm.getAvdSequenceNumber() == broadcastRecieptNumbers.intValue()){
+			publish(bm);
+			if(broadcastRecieptBuffer.size() != 0){
+				//See if others can be published as well
+				Collections.sort(broadcastRecieptBuffer);
+				// Iterate over it
+				for (BroadcastMessage broadcastMessage : broadcastRecieptBuffer) {
+					// If the largest sent sequenceID is one less than the current, sorted queue value, then send it.
+					if(broadcastMessage.getAvdSequenceNumber() == broadcastRecieptNumbers.intValue() + 1){
+						publish(broadcastMessage);
+						// Incrment it 
+						int incrementedValue = broadcastRecieptNumbers.incrementAndGet();
+						Log.v(INFO_TAG, "Inrementing to: " + incrementedValue);
+						// Remove it
+						broadcastRecieptBuffer.remove(broadcastMessage);
+					}
+					else{
+						Log.v(INFO_TAG, "We have hit a gap, we need to break where: " + broadcastRecieptNumbers.intValue() + ":" + broadcastMessage.getAvdSequenceNumber());
+						break;
+					}
+				}
+
+				
+			}
+		}
+		else{
+			Log.v(INFO_TAG, "Buffereing where bm.getAvdSequenceNumber()=" + bm.getAvdSequenceNumber() + " and broadcastRecieptNumbers.intValue()=" + broadcastRecieptNumbers.intValue());
+			broadcastRecieptBuffer.add(bm);
+		}
+	}
+
+	private void publish(BroadcastMessage bm) {
+		//1. publish it to the content provider
+		try {
+			Log.v(INFO_TAG, "Attempt to publish to ContentProvider");
+			mActivity.getContentResolver().acquireContentProviderClient("edu.buffalo.cse.cse486586.groupmessenger.provider").insert(mUri, bm.getAsContentValue());
+			Log.v(INFO_TAG, "Successful publish to ContentProvider");
+		} catch (RemoteException e) {
+			Log.v(INFO_TAG, "Error publishing to ContentProvider");
+			e.printStackTrace();
+		}
+		//2. Increment the counter
+		int newVal = broadcastRecieptNumbers.incrementAndGet();
+		Log.v(INFO_TAG, "Upon publish, broadcastRecieptNumbers=" + newVal);
+		//3. publish to the screen
+		publishProgress((String)bm.getAsContentValue().get(OnPTestClickListener.VALUE_FIELD));
 	}
 
 	private void initializeSequencer() {
