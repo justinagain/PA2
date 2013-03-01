@@ -61,7 +61,6 @@ public class ServerTask extends AsyncTask<ServerSocket, String, Void>{
 					processBroadcastReceipt(bm);
 				}
 				socket.close();
-				publishProgress(bm.getAvd()+":"+bm.getAvdSequenceNumber()+":"+bm.getMessage());
 			}
 		}
 		catch (IOException e){
@@ -77,52 +76,61 @@ public class ServerTask extends AsyncTask<ServerSocket, String, Void>{
 		int avdAwareSequenceId =  bm.getAvdSequenceNumber();
 		AtomicInteger largestSentSequenceId = globalSequencerNumbers.get(avdName);
 		if(avdAwareSequenceId - largestSentSequenceId.intValue() == 0 ){
-			Log.v(INFO_TAG, "Processed a broadcast request that is ready to be shipped out to all: no need to buffer");
-			int newValue = globalSequencerNumbers.get(avdName).incrementAndGet();
-			Log.v(INFO_TAG, "Incremented to: " + newValue);
-			if(bufferedSequencerMessages.get(avdName).size() == 0){
-				sequencerNumber.incrementAndGet();
-				Log.v(INFO_TAG, "Inrementing the global counter to: " + sequencerNumber.intValue());
-				bm.setAvdSequenceNumber(sequencerNumber.intValue() + "");
-				new BroadcastRequestClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, bm);
-				//push immediately
-			}
-			else{
-				// There is stuff on the queue to push - go get it
-				ArrayList<BroadcastMessage> bmbroadcastMessages = bufferedSequencerMessages.get(avdName);
-				// Add what you have just seen
-				bmbroadcastMessages.add(bm);
-				// Sort it
-				Collections.sort(bmbroadcastMessages);
-				// Iterate over it
-				for (BroadcastMessage broadcastMessage : bmbroadcastMessages) {
-					// If the largest sent sequenceID is one less than the current, sorted queue value, then send it.
-					if(broadcastMessage.getAvdSequenceNumber() == largestSentSequenceId.intValue() + 1){
-						// Send it!
-						// -- TODO send it
-						// Incrment it 
-						int incrementedValue = largestSentSequenceId.incrementAndGet();
-						Log.v(INFO_TAG, "Inrementing to: " + incrementedValue);
-						bmbroadcastMessages.remove(broadcastMessage);
-						broadcastMessage.setAvdSequenceNumber(sequencerNumber.intValue() + "");
-					}
-					else{
-						Log.v(INFO_TAG, "We have hit a gap, we need to break where: " + largestSentSequenceId.intValue() + ":" + broadcastMessage.getAvdSequenceNumber());
-						break;
-					}
-				}
-			}
+			broadcastMessage(bm, avdName, largestSentSequenceId);
 		} else {
-			Log.v(INFO_TAG, "Message came in: Processed a broadcast request that must be buffered");
-			publishProgress("Message came in: " + bm.getAvd() + ":" + bm.getAvdSequenceNumber());
-			bufferedSequencerMessages.get(avdName).add(bm);
+			bufferMessage(bm, avdName);
 		}
 	}
 
-	
+	private void bufferMessage(BroadcastMessage bm, String avdName) {
+		Log.v(INFO_TAG, "Message came in: Processed a broadcast request that must be buffered");
+		publishProgress("Message came in: " + bm.getAvd() + ":" + bm.getAvdSequenceNumber());
+		bufferedSequencerMessages.get(avdName).add(bm);
+	}
+
+	private void broadcastMessage(BroadcastMessage bm, String avdName,
+			AtomicInteger largestSentSequenceId) {
+		Log.v(INFO_TAG, "Processed a broadcast request that is ready to be shipped out to all: no need to buffer");
+		int newValue = globalSequencerNumbers.get(avdName).incrementAndGet();
+		Log.v(INFO_TAG, "Incremented to: " + newValue);
+		if(bufferedSequencerMessages.get(avdName).size() == 0){
+			sequencerNumber.incrementAndGet();
+			Log.v(INFO_TAG, "Inrementing the global counter to: " + sequencerNumber.intValue());
+			bm.setAvdSequenceNumber(sequencerNumber.intValue() + "");
+			//push immediately
+			new BroadcastRequestClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, bm);
+		}
+		else{
+			// There is stuff on the queue to push - go get it
+			ArrayList<BroadcastMessage> bmbroadcastMessages = bufferedSequencerMessages.get(avdName);
+			// Add what you have just seen
+			bmbroadcastMessages.add(bm);
+			// Sort it
+			Collections.sort(bmbroadcastMessages);
+			// Iterate over it
+			for (BroadcastMessage broadcastMessage : bmbroadcastMessages) {
+				// If the largest sent sequenceID is one less than the current, sorted queue value, then send it.
+				if(broadcastMessage.getAvdSequenceNumber() == largestSentSequenceId.intValue() + 1){
+					// Send it!
+					new BroadcastRequestClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, bm);
+					// Incrment it 
+					int incrementedValue = largestSentSequenceId.incrementAndGet();
+					Log.v(INFO_TAG, "Inrementing to: " + incrementedValue);
+					// Remove it
+					bmbroadcastMessages.remove(broadcastMessage);
+					broadcastMessage.setAvdSequenceNumber(sequencerNumber.intValue() + "");
+				}
+				else{
+					Log.v(INFO_TAG, "We have hit a gap, we need to break where: " + largestSentSequenceId.intValue() + ":" + broadcastMessage.getAvdSequenceNumber());
+					break;
+				}
+			}
+		}
+	}
+
 	private void processBroadcastReceipt(BroadcastMessage bm) {
-		// TODO Auto-generated method stub
-		
+		Log.v(INFO_TAG, "Processing a BroadcastReceipt");
+		publishProgress(bm.getAvd() + ":" + bm.getAvdSequenceNumber() + ":" + bm.getMessage());
 	}
 
 	private void initializeSequencer() {
