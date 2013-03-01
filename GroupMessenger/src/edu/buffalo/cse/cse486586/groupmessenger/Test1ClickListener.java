@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -20,9 +21,6 @@ import android.widget.TextView;
 public class Test1ClickListener implements OnClickListener {
 
     private static final String TAG = Test1ClickListener.class.getName();
-    private static final int TEST_CNT = 50;
-    public static final String KEY_FIELD = "key";
-    public static final String VALUE_FIELD = "value";
     private Activity mActivity;
     
     public Test1ClickListener(Activity _a) {
@@ -46,21 +44,24 @@ public class Test1ClickListener implements OnClickListener {
     	Log.v(TAG, "Registered the Test1Click");
     	String avd = Util.getPortNumber(mActivity);
     	ArrayList<BroadcastMessage> broadcastMessageList = new ArrayList<BroadcastMessage>();
-    	broadcastMessageList.add(createBroadcastMessageForTest(avd, "0", avd + ":" + "0"));
-    	broadcastMessageList.add(createBroadcastMessageForTest(avd, "1", avd + ":" + "1"));
-    	broadcastMessageList.add(createBroadcastMessageForTest(avd, "2", avd + ":" + "2"));
-    	broadcastMessageList.add(createBroadcastMessageForTest(avd, "3", avd + ":" + "3"));
-    	broadcastMessageList.add(createBroadcastMessageForTest(avd, "4", avd + ":" + "4"));
+    	for(int i = 0; i <= 4; i++){
+	    	// Use the sequence number from the send button for consistency
+	    	new Test1Task().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, 
+	    			createBroadcastMessageForTest(
+	    					avd, 
+	    					SendOnClickListener.avdAwareSequenceId.intValue()+"", 
+	    					avd + ":" + SendOnClickListener.avdAwareSequenceId.intValue()+""));
+	    	SendOnClickListener.avdAwareSequenceId.incrementAndGet();
+	    	try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    }
     	
-    	new Test1Task().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, 
-    			broadcastMessageList.get(0),
-    			broadcastMessageList.get(1),
-    			broadcastMessageList.get(2),
-    			broadcastMessageList.get(3),
-    			broadcastMessageList.get(4));
-       }
-
-    
+    	
     private BroadcastMessage createBroadcastMessageForTest(String avd, String sequenceNumber, String message){
     	BroadcastMessage bm = BroadcastMessage.getRequestBroadcaseMessage();
     	bm.setAvd(avd);

@@ -31,7 +31,7 @@ public class SendOnClickListener implements OnClickListener {
     private final Uri mUri;
     private final Activity mActivity;
     
-    private AtomicInteger avdAwareSequenceId = new AtomicInteger(0);
+    public static AtomicInteger avdAwareSequenceId = new AtomicInteger(0);
 
     public SendOnClickListener(Activity _a, TextView _tv, TextView _metv){
         mEditTextView = _metv;
