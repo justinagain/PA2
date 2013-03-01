@@ -36,6 +36,8 @@ public class GroupMessengerActivity extends Activity {
         textView.setMovementMethod(new ScrollingMovementMethod());
         findViewById(R.id.button1).setOnClickListener(
                 new OnPTestClickListener(textView, getContentResolver()));
+        findViewById(R.id.button2).setOnClickListener(
+                new Test1ClickListener(this));
         createServerSocket();
 		Button sendButton = (Button) findViewById(R.id.button4);
 		TextView editTextView = (TextView)findViewById(R.id.editText1);

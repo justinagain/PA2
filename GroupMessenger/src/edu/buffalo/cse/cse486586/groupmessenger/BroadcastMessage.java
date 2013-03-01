@@ -12,7 +12,7 @@ public class BroadcastMessage implements Comparable<BroadcastMessage>{
 	private static final int MSG_INSERT_PT = 14;
 	private static final byte ARRAY_INITIALIZER = "z".getBytes()[0];
 	public static final int MSG_SIZE = 142;
-	byte[] payload;
+	private byte[] payload;
 	
 	private BroadcastMessage(String type) {
 		payload = new byte[142];
