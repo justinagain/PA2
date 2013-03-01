@@ -63,7 +63,7 @@ public class Test1ClickListener implements OnClickListener {
     	
     	
     private BroadcastMessage createBroadcastMessageForTest(String avd, String sequenceNumber, String message){
-    	BroadcastMessage bm = BroadcastMessage.getRequestBroadcaseMessage();
+    	BroadcastMessage bm = BroadcastMessage.getRequestBroadcastMessage();
     	bm.setAvd(avd);
     	bm.setAvdSequenceNumber(sequenceNumber);
     	bm.setMessageSize(message.length()+"");

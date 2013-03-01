@@ -32,8 +32,9 @@ public class Test2ClickListener implements OnClickListener {
     public void onClick(View v) {
     	Log.v(TAG, "Registered the Test2Click");
     	String avd = Util.getPortNumber(mActivity);
-    	new SequencerRequestClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, 
-    			createBroadcastMessageForTest(avd, SendOnClickListener.AVD_AWARE_SEQUENCE_ID.intValue()+"", avd + ":" + SendOnClickListener.AVD_AWARE_SEQUENCE_ID.intValue()+""));
+    	String sequenceNumber = SendOnClickListener.AVD_AWARE_SEQUENCE_ID.intValue()+"";
+    	BroadcastMessage bm = createBroadcastMessageForTest(avd, sequenceNumber, avd + ":" + sequenceNumber);
+    	new SequencerRequestClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, bm);
 	    SendOnClickListener.AVD_AWARE_SEQUENCE_ID.incrementAndGet();
     }
     	

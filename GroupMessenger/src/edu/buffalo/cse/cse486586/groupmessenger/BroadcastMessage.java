@@ -44,7 +44,7 @@ public class BroadcastMessage implements Comparable<BroadcastMessage>{
 	}
 	
 	/** Factory methods to create specific message types */
-	public static BroadcastMessage getRequestBroadcaseMessage(){
+	public static BroadcastMessage getRequestBroadcastMessage(){
 		BroadcastMessage broadcastMessage = new BroadcastMessage(REQUEST_BROADCAST);
 		return broadcastMessage;
 	}

@@ -57,7 +57,7 @@ public class SendOnClickListener implements OnClickListener {
 
 	private void sendToClients(String messageText) {
 		Log.v(TAG, "Creating BroadcastMessage and setting values");
-		BroadcastMessage bm = BroadcastMessage.getRequestBroadcaseMessage();
+		BroadcastMessage bm = BroadcastMessage.getRequestBroadcastMessage();
 		bm.setAvd(Util.getPortNumber(mActivity));
 		bm.setAvdSequenceNumber(AVD_AWARE_SEQUENCE_ID.intValue() + "");
 		AVD_AWARE_SEQUENCE_ID.incrementAndGet();

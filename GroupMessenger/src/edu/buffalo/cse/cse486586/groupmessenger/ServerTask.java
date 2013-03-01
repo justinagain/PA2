@@ -70,12 +70,13 @@ public class ServerTask extends AsyncTask<ServerSocket, String, Void>{
 				else if(bm.isTestTwoBroadcast()){
 					Log.v(INFO_TAG, "A TestTwo broadcast has been received.");					
 					processBroadcastReceipt(bm);
-					// Call it once
-					createTestTwoGenericBroadcastRequest();					
-					// Call it twice
-					createTestTwoGenericBroadcastRequest();					
+					//if(bm.getAvd().equals(Util.getPortNumber(mActivity))){
+						// Call it once
+						createTestTwoGenericBroadcastRequest();							
+						// Call it twice
+						//createTestTwoGenericBroadcastRequest();					
+					//}
 				}
-
 				socket.close();
 			}
 		}
@@ -86,19 +87,19 @@ public class ServerTask extends AsyncTask<ServerSocket, String, Void>{
 	}
 
 	private void createTestTwoGenericBroadcastRequest() {
-		Log.v(INFO_TAG, "Creating BroadcastMessage and setting values");
-		BroadcastMessage testTwoRequestBroadcast = BroadcastMessage.getRequestBroadcaseMessage();
+		Log.v(INFO_TAG, "Creating TestTwoGenericBroadcastRequest and setting values");
+		BroadcastMessage testTwoRequestBroadcast = BroadcastMessage.getRequestBroadcastMessage();
 		String avd = Util.getPortNumber(mActivity);
 		testTwoRequestBroadcast.setAvd(avd);
 		testTwoRequestBroadcast.setAvdSequenceNumber(SendOnClickListener.AVD_AWARE_SEQUENCE_ID.intValue() + "");
 		int id = SendOnClickListener.AVD_AWARE_SEQUENCE_ID.intValue();
-		SendOnClickListener.AVD_AWARE_SEQUENCE_ID.incrementAndGet();
 		String message = avd + ":" + id;
 		testTwoRequestBroadcast.setMessageSize(message.length() + "");
 		testTwoRequestBroadcast.setMessage(message);
 		Log.v(INFO_TAG, "BroadcastMessage created for " + avd);
 		Log.v(INFO_TAG, "avdAwareSequenceNumber is: " + SendOnClickListener.AVD_AWARE_SEQUENCE_ID.intValue());
 		new SequencerRequestClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, testTwoRequestBroadcast);
+		SendOnClickListener.AVD_AWARE_SEQUENCE_ID.incrementAndGet();
 	}
 
 	private void processBroadcastRequest(BroadcastMessage bm, String type) {
