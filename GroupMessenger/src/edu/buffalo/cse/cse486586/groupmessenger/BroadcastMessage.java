@@ -4,8 +4,8 @@ import android.content.ContentValues;
 
 public class BroadcastMessage implements Comparable<BroadcastMessage>{
 	
-	private static final String REQUEST_BROADCAST = "r";
-	private static final String BROADCAST = "b";
+	public static final String REQUEST_BROADCAST = "r";
+	public static final String BROADCAST = "b";
 	private static final int AVD_INSERT_PT = 1;
 	private static final int AVD_SEQUENCE_NUMBER_INSERT_PT = 5;
 	private static final int MSG_SIZE_INSERT_PT = 11;
@@ -34,6 +34,13 @@ public class BroadcastMessage implements Comparable<BroadcastMessage>{
 		}
 	}
 	
+	private void reinitializeArray(int startIndex, int length){
+		for (int i = 0; i < length; i++) {
+			payload[startIndex] = ARRAY_INITIALIZER;
+			startIndex++;
+		}		
+	}
+	
 	/** Factory methods to create specific message types */
 	public static BroadcastMessage getRequestBroadcaseMessage(){
 		BroadcastMessage broadcastMessage = new BroadcastMessage(REQUEST_BROADCAST);
@@ -50,9 +57,19 @@ public class BroadcastMessage implements Comparable<BroadcastMessage>{
 	public boolean isBroadcast(){ return determineType(BROADCAST); }
 	public void setAvd(String avd){ insertTextPayloadContent(avd, AVD_INSERT_PT); }
 	public String getAvd(){ return new String(getPayloadAsString(4, AVD_INSERT_PT)); }
-	public void setAvdSequenceNumber(String sequenceNumber){ insertTextPayloadContent(sequenceNumber, AVD_SEQUENCE_NUMBER_INSERT_PT);}
+	
+	public void setAvdSequenceNumber(String sequenceNumber){ 
+		reinitializeArray(AVD_SEQUENCE_NUMBER_INSERT_PT, 6);
+		insertTextPayloadContent(sequenceNumber, AVD_SEQUENCE_NUMBER_INSERT_PT);
+	}
+	
 	public int getAvdSequenceNumber(){ return Integer.parseInt(getPayloadAsInt(6, AVD_SEQUENCE_NUMBER_INSERT_PT));}
-	public void setMessageSize(String messageSize){ insertTextPayloadContent(messageSize, MSG_SIZE_INSERT_PT); }
+	
+	public void setMessageSize(String messageSize){ 
+		reinitializeArray(MSG_SIZE_INSERT_PT, 3);
+		insertTextPayloadContent(messageSize, MSG_SIZE_INSERT_PT); 
+	}
+	
 	public int getMessageSize(){ return Integer.parseInt(getPayloadAsInt(3, MSG_SIZE_INSERT_PT));}
 	public void setMessage(String message){ insertTextPayloadContent(message, MSG_INSERT_PT); }
 	public String getMessage(){ return new String(getPayloadAsString(getMessageSize(), MSG_INSERT_PT)); }
@@ -101,6 +118,10 @@ public class BroadcastMessage implements Comparable<BroadcastMessage>{
 	@Override
 	public int compareTo(BroadcastMessage comparedToBroadcastMessage) {
 		return getAvdSequenceNumber() - comparedToBroadcastMessage.getAvdSequenceNumber();	
+	}
+
+	public void setType(String type) {
+		payload[0] = type.getBytes()[0];
 	}
 	
 }

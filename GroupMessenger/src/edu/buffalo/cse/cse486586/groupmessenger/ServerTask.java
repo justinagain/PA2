@@ -21,7 +21,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 public class ServerTask extends AsyncTask<ServerSocket, String, Void>{
-	final static String INFO_TAG = "Project 2 Info: ";
+	final static String INFO_TAG = ServerTask.class.getName();
 	private Activity mActivity;
 	private Uri mUri;
 
@@ -71,6 +71,8 @@ public class ServerTask extends AsyncTask<ServerSocket, String, Void>{
 	}
 
 	private void processBroadcastRequest(BroadcastMessage bm) {
+		//set bm as send message
+		bm.setType(BroadcastMessage.BROADCAST);
 		String avdName = bm.getAvd();
 		int avdAwareSequenceId =  bm.getAvdSequenceNumber();
 		AtomicInteger largestSentSequenceId = globalSequencerNumbers.get(avdName);
@@ -82,6 +84,7 @@ public class ServerTask extends AsyncTask<ServerSocket, String, Void>{
 				sequencerNumber.incrementAndGet();
 				Log.v(INFO_TAG, "Inrementing the global counter to: " + sequencerNumber.intValue());
 				bm.setAvdSequenceNumber(sequencerNumber.intValue() + "");
+				new BroadcastRequestClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, bm);
 				//push immediately
 			}
 			else{
@@ -110,7 +113,8 @@ public class ServerTask extends AsyncTask<ServerSocket, String, Void>{
 				}
 			}
 		} else {
-			Log.v(INFO_TAG, "Processed a broadcast request that must be buffered");
+			Log.v(INFO_TAG, "Message came in: Processed a broadcast request that must be buffered");
+			publishProgress("Message came in: " + bm.getAvd() + ":" + bm.getAvdSequenceNumber());
 			bufferedSequencerMessages.get(avdName).add(bm);
 		}
 	}

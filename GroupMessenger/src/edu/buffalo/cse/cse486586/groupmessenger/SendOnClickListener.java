@@ -65,29 +65,7 @@ public class SendOnClickListener implements OnClickListener {
 		bm.setMessage(messageText);
 		Log.v(TAG, "BroadcastMessage created for " + Util.getPortNumber(mActivity));
 		Log.v(TAG, "avdAwareSequenceNumber is: " + avdAwareSequenceId.intValue());
-		new ClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, bm);
+		new SequencerRequestClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, bm);
 	}
-
-	private class ClientTask extends AsyncTask<BroadcastMessage, Void, Void>{
-		protected Void doInBackground(BroadcastMessage... msgs){
-			try {
-				Log.v(TAG, "About to push to socket: " + Constants.SEQUENCER);
-				Socket writeSocket = new Socket(Constants.IP_ADDRESS, Constants.SEQUENCER);
-				writeSocket.getOutputStream().write(msgs[0].getPayload());
-				writeSocket.getOutputStream().flush();
-				writeSocket.close();
-				Log.v(TAG, "Pushed!");
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-				Log.v(TAG, "Error creating Inet Address");
-			} catch (IOException e) {
-				Log.v(TAG, "Error creating Socket");
-				e.printStackTrace();
-			}
-			return null;
-		}
-	}
-
-	
 	
 }
