@@ -38,6 +38,8 @@ public class GroupMessengerActivity extends Activity {
                 new OnPTestClickListener(textView, getContentResolver()));
         findViewById(R.id.button2).setOnClickListener(
                 new Test1ClickListener(this));
+        findViewById(R.id.button3).setOnClickListener(
+                new Test2ClickListener(this));
         createServerSocket();
 		Button sendButton = (Button) findViewById(R.id.button4);
 		TextView editTextView = (TextView)findViewById(R.id.editText1);

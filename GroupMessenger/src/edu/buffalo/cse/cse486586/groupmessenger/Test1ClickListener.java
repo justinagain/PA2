@@ -49,9 +49,9 @@ public class Test1ClickListener implements OnClickListener {
 	    	new Test1Task().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, 
 	    			createBroadcastMessageForTest(
 	    					avd, 
-	    					SendOnClickListener.avdAwareSequenceId.intValue()+"", 
-	    					avd + ":" + SendOnClickListener.avdAwareSequenceId.intValue()+""));
-	    	SendOnClickListener.avdAwareSequenceId.incrementAndGet();
+	    					SendOnClickListener.AVD_AWARE_SEQUENCE_ID.intValue()+"", 
+	    					avd + ":" + SendOnClickListener.AVD_AWARE_SEQUENCE_ID.intValue()+""));
+	    	SendOnClickListener.AVD_AWARE_SEQUENCE_ID.incrementAndGet();
 	    	try {
 				Thread.sleep(3000);
 			} catch (InterruptedException e) {

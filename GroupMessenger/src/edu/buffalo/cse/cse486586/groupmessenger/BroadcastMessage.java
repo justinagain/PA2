@@ -6,6 +6,8 @@ public class BroadcastMessage implements Comparable<BroadcastMessage>{
 	
 	public static final String REQUEST_BROADCAST = "r";
 	public static final String BROADCAST = "b";
+	public static final String TEST_TWO_REQUEST_BROADCAST = "t";
+	public static final String TEST_TWO_BROADCAST = "c";
 	private static final int AVD_INSERT_PT = 1;
 	private static final int AVD_SEQUENCE_NUMBER_INSERT_PT = 5;
 	private static final int MSG_SIZE_INSERT_PT = 11;
@@ -52,9 +54,17 @@ public class BroadcastMessage implements Comparable<BroadcastMessage>{
 		return broadcastMessage;		
 	}
 	
+	public static BroadcastMessage getTestTwoRequestBroadcastMessage() {
+		BroadcastMessage broadcastMessage = new BroadcastMessage(TEST_TWO_REQUEST_BROADCAST);
+		return broadcastMessage;		
+	}
+	
+	
 	/** Public accessor methods */
 	public boolean isRequestBroadcast(){ return determineType(REQUEST_BROADCAST); }
 	public boolean isBroadcast(){ return determineType(BROADCAST); }
+	public boolean isTestTwoRequestBroadcast(){ return determineType(TEST_TWO_REQUEST_BROADCAST); }
+	public boolean isTestTwoBroadcast() { return determineType(TEST_TWO_BROADCAST);}
 	public void setAvd(String avd){ insertTextPayloadContent(avd, AVD_INSERT_PT); }
 	public String getAvd(){ return new String(getPayloadAsString(4, AVD_INSERT_PT)); }
 	
@@ -123,5 +133,5 @@ public class BroadcastMessage implements Comparable<BroadcastMessage>{
 	public void setType(String type) {
 		payload[0] = type.getBytes()[0];
 	}
-	
+
 }

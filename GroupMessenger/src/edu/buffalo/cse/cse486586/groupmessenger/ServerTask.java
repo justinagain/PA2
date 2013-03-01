@@ -57,12 +57,25 @@ public class ServerTask extends AsyncTask<ServerSocket, String, Void>{
 				BroadcastMessage bm = BroadcastMessage.createMessageFromByteArray(data);
 				if(bm.isRequestBroadcast()){
 					Log.v(INFO_TAG, "A broadcast request has been received.");
-					processBroadcastRequest(bm);
+					processBroadcastRequest(bm, BroadcastMessage.BROADCAST);
 				}
-				else{
+				else if(bm.isBroadcast()){
 					Log.v(INFO_TAG, "A broadcast has been received.");					
 					processBroadcastReceipt(bm);
 				}
+				else if(bm.isTestTwoRequestBroadcast()){
+					Log.v(INFO_TAG, "TestTwo case has been received.");					
+					processBroadcastRequest(bm, BroadcastMessage.TEST_TWO_BROADCAST);					
+				}				
+				else if(bm.isTestTwoBroadcast()){
+					Log.v(INFO_TAG, "A TestTwo broadcast has been received.");					
+					processBroadcastReceipt(bm);
+					// Call it once
+					createTestTwoGenericBroadcastRequest();					
+					// Call it twice
+					createTestTwoGenericBroadcastRequest();					
+				}
+
 				socket.close();
 			}
 		}
@@ -72,9 +85,25 @@ public class ServerTask extends AsyncTask<ServerSocket, String, Void>{
 		return null;
 	}
 
-	private void processBroadcastRequest(BroadcastMessage bm) {
+	private void createTestTwoGenericBroadcastRequest() {
+		Log.v(INFO_TAG, "Creating BroadcastMessage and setting values");
+		BroadcastMessage testTwoRequestBroadcast = BroadcastMessage.getRequestBroadcaseMessage();
+		String avd = Util.getPortNumber(mActivity);
+		testTwoRequestBroadcast.setAvd(avd);
+		testTwoRequestBroadcast.setAvdSequenceNumber(SendOnClickListener.AVD_AWARE_SEQUENCE_ID.intValue() + "");
+		int id = SendOnClickListener.AVD_AWARE_SEQUENCE_ID.intValue();
+		SendOnClickListener.AVD_AWARE_SEQUENCE_ID.incrementAndGet();
+		String message = avd + ":" + id;
+		testTwoRequestBroadcast.setMessageSize(message.length() + "");
+		testTwoRequestBroadcast.setMessage(message);
+		Log.v(INFO_TAG, "BroadcastMessage created for " + avd);
+		Log.v(INFO_TAG, "avdAwareSequenceNumber is: " + SendOnClickListener.AVD_AWARE_SEQUENCE_ID.intValue());
+		new SequencerRequestClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, testTwoRequestBroadcast);
+	}
+
+	private void processBroadcastRequest(BroadcastMessage bm, String type) {
 		//set bm as send message
-		bm.setType(BroadcastMessage.BROADCAST);
+		bm.setType(type);
 		String avdName = bm.getAvd();
 		int avdAwareSequenceId =  bm.getAvdSequenceNumber();
 		AtomicInteger largestSentSequenceId = globalSequencerNumbers.get(avdName);

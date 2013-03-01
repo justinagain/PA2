@@ -31,7 +31,7 @@ public class SendOnClickListener implements OnClickListener {
     private final Uri mUri;
     private final Activity mActivity;
     
-    public static AtomicInteger avdAwareSequenceId = new AtomicInteger(0);
+    public static AtomicInteger AVD_AWARE_SEQUENCE_ID = new AtomicInteger(0);
 
     public SendOnClickListener(Activity _a, TextView _tv, TextView _metv){
         mEditTextView = _metv;
@@ -59,12 +59,12 @@ public class SendOnClickListener implements OnClickListener {
 		Log.v(TAG, "Creating BroadcastMessage and setting values");
 		BroadcastMessage bm = BroadcastMessage.getRequestBroadcaseMessage();
 		bm.setAvd(Util.getPortNumber(mActivity));
-		bm.setAvdSequenceNumber(avdAwareSequenceId.intValue() + "");
-		avdAwareSequenceId.incrementAndGet();
+		bm.setAvdSequenceNumber(AVD_AWARE_SEQUENCE_ID.intValue() + "");
+		AVD_AWARE_SEQUENCE_ID.incrementAndGet();
 		bm.setMessageSize(messageText.length() + "");
 		bm.setMessage(messageText);
 		Log.v(TAG, "BroadcastMessage created for " + Util.getPortNumber(mActivity));
-		Log.v(TAG, "avdAwareSequenceNumber is: " + avdAwareSequenceId.intValue());
+		Log.v(TAG, "avdAwareSequenceNumber is: " + AVD_AWARE_SEQUENCE_ID.intValue());
 		new SequencerRequestClientTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, bm);
 	}
 	
